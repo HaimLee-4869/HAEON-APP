@@ -1,0 +1,6 @@
+import { StyleSheet, Text, View } from 'react-native';
+import Svg, { Circle } from 'react-native-svg';
+import { colors } from '@/constants/theme';
+import type { RiskBreakdown } from '@/types/domain';
+export function RiskDonut({ risk }: { risk: RiskBreakdown }) { const values = [{ value: risk.caution, color: colors.warning }, { value: risk.safe, color: '#54BD7A' }, { value: risk.warning, color: '#F15B5B' }, { value: risk.danger, color: '#7B7F8B' }]; let offset = 0; return <View style={styles.wrap}><Svg width={92} height={92} viewBox="0 0 42 42" style={{ transform: [{ rotate: '-90deg' }] }}>{values.map((entry) => { const start = offset; offset += entry.value; return <Circle key={entry.color} cx="21" cy="21" r="15.9155" fill="transparent" stroke={entry.color} strokeWidth="7" strokeDasharray={`${entry.value} ${100 - entry.value}`} strokeDashoffset={-start} />; })}</Svg><View style={styles.label}><Text style={styles.score}>{risk.representativeScore}%</Text><Text style={styles.level}>{risk.representativeLevel}</Text></View></View>; }
+const styles = StyleSheet.create({ wrap: { width: 92, height: 92, alignItems: 'center', justifyContent: 'center' }, label: { position: 'absolute', alignItems: 'center' }, score: { fontSize: 20, fontWeight: '900', color: colors.text }, level: { fontSize: 9, color: colors.muted } });

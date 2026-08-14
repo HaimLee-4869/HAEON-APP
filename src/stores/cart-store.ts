@@ -1,0 +1,3 @@
+import { create } from 'zustand';
+interface CartState { quantities: Record<string, number>; count: number; add: (productId: string) => void; remove: (productId: string) => void; clear: () => void }
+export const useCartStore = create<CartState>((set) => ({ quantities: {}, count: 0, add: (id) => set((state) => ({ quantities: { ...state.quantities, [id]: (state.quantities[id] ?? 0) + 1 }, count: state.count + 1 })), remove: (id) => set((state) => { const quantity = state.quantities[id] ?? 0; if (!quantity) return state; return { quantities: { ...state.quantities, [id]: quantity - 1 }, count: state.count - 1 }; }), clear: () => set({ quantities: {}, count: 0 }) }));

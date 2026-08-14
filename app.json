@@ -9,7 +9,7 @@
     "newArchEnabled": true,
     "plugins": [
       "expo-router",
-      ["expo-location", { "locationWhenInUsePermission": "긴급 신고 위치를 확인하기 위해 위치 권한이 필요합니다." }],
+      ["expo-location", { "locationWhenInUsePermission": "지도에서 현재 위치를 확인하기 위해 위치 권한이 필요합니다." }],
       ["expo-image-picker", { "photosPermission": "신고 사진과 영상을 첨부하기 위해 미디어 접근 권한이 필요합니다.", "cameraPermission": "신고 사진을 촬영하기 위해 카메라 접근 권한이 필요합니다." }]
     ],
     "experiments": { "typedRoutes": true },

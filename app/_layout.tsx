@@ -9,5 +9,5 @@ const queryClient = new QueryClient({ defaultOptions: { queries: { retry: 1, ref
 export default function RootLayout() {
   const bootstrap = useAuthStore((state) => state.bootstrap);
   useEffect(() => { let cleanup: (() => void) | undefined; void bootstrap().then((dispose) => { cleanup = dispose; }); return () => cleanup?.(); }, [bootstrap]);
-  return <SafeAreaProvider><QueryClientProvider client={queryClient}><StatusBar style="dark" /><Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#F6F7FA' } }}><Stack.Screen name="(tabs)" /><Stack.Screen name="settings" options={{ animation: 'slide_from_right' }} /><Stack.Screen name="login" options={{ presentation: 'modal' }} /></Stack></QueryClientProvider></SafeAreaProvider>;
+  return <SafeAreaProvider><QueryClientProvider client={queryClient}><StatusBar style="dark" /><Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#F6F7FA' } }}><Stack.Screen name="(tabs)" /><Stack.Screen name="tide/[region]" options={{ animation: 'slide_from_right' }} /><Stack.Screen name="settings" options={{ animation: 'slide_from_right' }} /><Stack.Screen name="login" options={{ presentation: 'modal' }} /></Stack></QueryClientProvider></SafeAreaProvider>;
 }

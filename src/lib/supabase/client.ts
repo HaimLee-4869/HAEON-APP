@@ -13,5 +13,5 @@ const serverStorage = {
 };
 const authStorage = typeof window === 'undefined' ? serverStorage : AsyncStorage;
 export const supabase: SupabaseClient | null = isSupabaseConfigured
-  ? createClient(url!, publishableKey!, { auth: { storage: authStorage, autoRefreshToken: typeof window !== 'undefined', persistSession: typeof window !== 'undefined', detectSessionInUrl: false } })
+  ? createClient(url!, publishableKey!, { auth: { storage: authStorage, autoRefreshToken: true, persistSession: true, detectSessionInUrl: false }, realtime: { params: { eventsPerSecond: 10 } } })
   : null;

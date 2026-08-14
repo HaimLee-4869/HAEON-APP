@@ -1,0 +1,6 @@
+import { describe, expect, it, vi } from 'vitest';
+import { aggregateSafetyReport, RuleBasedSafetyGuideProvider } from './safety-report-service';
+
+vi.mock('../lib/supabase/client', () => ({ supabase: null }));
+describe('safety report aggregation', () => { it('aggregates actual metrics without inventing depth', () => { const report = aggregateSafetyReport('daily', { sessions: [{ started_at: '2026-01-01T00:00:00Z', ended_at: '2026-01-01T05:00:00Z' }], locations: [{ latitude: 33, longitude: 126, measured_at: '2026-01-01T00:00:00Z' }, { latitude: 33, longitude: 126.01, measured_at: '2026-01-01T01:00:00Z' }], risks: [{ score: 40, level: 'caution' }, { score: 80, level: 'danger', factors: { highWave: true } }], alerts: [{ id: '1' }, { id: '2' }, { id: '3' }] }); expect(report.risk.representativeScore).toBe(60); expect(report.risk.caution + report.risk.danger).toBe(100); expect(report.activity.averageDepth).toBe('데이터 없음'); expect(report.guides.some((item) => item.reference === 'highWave')).toBe(true); }); });
+describe('guide generation', () => { it('maps factors deterministically', () => { const guides = new RuleBasedSafetyGuideProvider().getSafetyGuide({ factors: ['lowTemperature', 'dangerZone'], report: {} as never }); expect(guides.map((item) => item.reference)).toEqual(['lowTemperature', 'dangerZone']); }); });

@@ -6,6 +6,7 @@
     "orientation": "portrait",
     "scheme": "haeonsafe",
     "userInterfaceStyle": "light",
+    "icon": "./pic/app.png",
     "newArchEnabled": true,
     "plugins": [
       "expo-router",
@@ -28,17 +29,32 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "kr.haeon.safe"
+      "bundleIdentifier": "kr.haeon.safe",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "kr.haeon.safe",
       "adaptiveIcon": {
+        "foregroundImage": "./pic/app.png",
         "backgroundColor": "#6C3BF4"
-      }
+      },
+      "permissions": [
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "bundler": "metro",
       "output": "static"
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "1854b075-91c6-4d85-abf0-2730b3311172"
+      }
     }
   }
 }

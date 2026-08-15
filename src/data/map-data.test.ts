@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { markersForLayer, sampleMarkers, searchMarkers } from './map-data';
-describe('map data adapters', () => {
-  it('filters marker layers', () => { expect(markersForLayer(sampleMarkers, 'haenyeo').every((m) => m.kind === 'user')).toBe(true); expect(markersForLayer(sampleMarkers, 'wave')).toEqual([]); });
-  it('searches user, device and region fields', () => { expect(searchMarkers(sampleMarkers, 'TW-102')).toHaveLength(1); expect(searchMarkers(sampleMarkers, '서귀포').length).toBeGreaterThan(0); });
+import { markersForLayer, monitoringSubjectsToMarkers, searchMarkers } from './map-data';
+import type { MonitoringSubject } from '@/types/database';
+
+const subject = { haenyeo: { id: 'h1', display_name: '해온', user_code: 'AMA-0112', activity_region: '서귀포' }, device: { id: 'd1', device_code: 'TW-1', status: 'online', battery_level: 80 }, latestLocation: { latitude: 33.2, longitude: 126.5 }, latestRisk: { level: 'caution' }, batteryLevel: 80, connectionStatus: 'online', lastCommunicatedAt: '2026-01-01T00:00:00Z' } as MonitoringSubject;
+describe('map monitoring data', () => {
+  it('maps only subjects with an assigned device and real location', () => { const markers = monitoringSubjectsToMarkers([subject]); expect(markers).toHaveLength(1); expect(markers[0]).toMatchObject({ userCode: 'AMA-0112', deviceCode: 'TW-1', status: 'caution', source: 'supabase' }); });
+  it('filters and searches marker fields', () => { const markers = monitoringSubjectsToMarkers([subject]); expect(markersForLayer(markers, 'haenyeo')).toHaveLength(1); expect(markersForLayer(markers, 'wave')).toEqual([]); expect(searchMarkers(markers, 'TW-1')).toHaveLength(1); });
 });

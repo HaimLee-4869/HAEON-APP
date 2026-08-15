@@ -17,7 +17,7 @@ export interface MapMarker {
   region?: string;
   lastCommunication?: string;
   batteryPercent?: number;
-  source: 'sample' | 'api';
+  source: 'supabase';
 }
 export interface MapCamera { latitude: number; longitude: number; zoom?: number }
 export interface RiskZone { id: string; name: string; coordinates: { latitude: number; longitude: number }[]; status: Extract<MarkerStatus, 'caution' | 'warning' | 'danger'> }
@@ -40,9 +40,15 @@ export interface EmergencyReport {
 
 export type ReportPeriod = 'daily' | 'weekly' | 'monthly';
 export interface RiskBreakdown { safe: number; caution: number; warning: number; danger: number; representativeScore: number | null; representativeLevel: string }
-export interface ActivitySummary { workDuration: string; travelDistance: string; averageDepth: string; highestRisk: string; averageRisk: string; alertCount: string; locationActivity: string }
+export interface ActivitySummary { workDuration: string; travelDistance: string; sessionCount: string; highestRisk: string; averageRisk: string; alertCount: string; locationActivity: string }
 export interface SafetyGuide { id: string; text: string; source?: string; reference?: string }
-export interface SafetyReport { period: ReportPeriod; risk: RiskBreakdown; activity: ActivitySummary; commentTitle: string; comment: string; guides: SafetyGuide[]; hasData: boolean }
+export interface SafetyComment { headline: string; details: string[] }
+export interface CurrentRiskFactor { code: string; description: string; score: number }
+export interface CurrentSafetySummary { score: number | null; level: import('./database').RiskLevel | null; levelLabel: string; calculatedAt: string | null; factors: CurrentRiskFactor[] }
+export interface CurrentActivitySummary { activityStatus: string; battery: string; lastCommunication: string; todayAlerts: string; connectionStatus: string; todayDistance: string }
+export interface RecentRiskEvent { id: string; title: string; message: string; type: string; severity: import('./database').AlertSeverity; status: import('./database').AlertStatus; occurredAt: string }
+export interface HistoricalSafetySummary { hasData: boolean; risk: RiskBreakdown; activity: ActivitySummary; trend: { at: string; score: number; level: import('./database').RiskLevel }[] }
+export interface SafetyReport { period: ReportPeriod; current: CurrentSafetySummary; currentActivity: CurrentActivitySummary; recentAlerts: RecentRiskEvent[]; historical: HistoricalSafetySummary | null; comment: SafetyComment; guides: SafetyGuide[]; hasData: boolean }
 
 export type ProductCategory = 'all' | 'taewak' | 'iot' | 'subscription' | 'accessory';
 export interface Product { id: string; name: string; price: number; category: Exclude<ProductCategory, 'all'>; image?: string }

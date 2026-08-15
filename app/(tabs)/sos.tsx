@@ -9,7 +9,7 @@ import { EmptyState, ErrorState, LoadingState, SegmentedControl, StatusBadge } f
 import { colors } from '@/constants/theme';
 import { emergencyReportRepository } from '@/lib/repositories/emergency-report-repository';
 import type { EmergencyMedia, EmergencyReport } from '@/types/domain';
-import { formatCoordinates, formatKoreanAddress } from '@/utils/location';
+import { formatCoordinates } from '@/utils/location';
 import { getSosCountdown, isSosHoldComplete, SOS_HOLD_MS } from '@/utils/sos-long-press';
 
 type SosTab = 'write' | 'history';
@@ -20,22 +20,21 @@ export default function SosScreen() {
   const [tab, setTab] = useState<SosTab>('write');
   const [description, setDescription] = useState(''); const [consent, setConsent] = useState(true);
   const [address, setAddress] = useState(initialAddress); const [coords, setCoords] = useState<{ latitude: number; longitude: number } | null>(null);
-  const [media, setMedia] = useState<EmergencyMedia[]>([]); const [locating, setLocating] = useState(false); const [locationError, setLocationError] = useState(false);
+  const [media, setMedia] = useState<EmergencyMedia[]>([]); const [locating, setLocating] = useState(false);
   const [sosState, setSosState] = useState<SosState>('idle'); const [elapsed, setElapsed] = useState(0); const [sosError, setSosError] = useState('');
   const [history, setHistory] = useState<EmergencyReport[]>([]); const [historyState, setHistoryState] = useState<'idle' | 'loading' | 'error'>('idle'); const [historyError, setHistoryError] = useState('');
   const startedAt = useRef(0); const tick = useRef<ReturnType<typeof setInterval> | null>(null); const completed = useRef(false);
 
   const locate = useCallback(async () => {
-    setLocating(true); setLocationError(false);
+    setLocating(true);
     try {
       const permission = await Location.requestForegroundPermissionsAsync();
       if (!permission.granted) throw new Error('위치 권한이 필요합니다. 설정에서 권한을 허용해 주세요.');
       const position = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
       const next = { latitude: position.coords.latitude, longitude: position.coords.longitude }; setCoords(next);
-      try { const places = await Location.reverseGeocodeAsync(next); setAddress(formatKoreanAddress(places[0]) ?? formatCoordinates(next.latitude, next.longitude)); }
-      catch { setAddress(formatCoordinates(next.latitude, next.longitude)); setLocationError(true); }
+      setAddress(formatCoordinates(next.latitude, next.longitude));
       return next;
-    } catch (error) { setAddress(coords ? formatCoordinates(coords.latitude, coords.longitude) : '위치를 확인하지 못했습니다. 다시 시도해 주세요.'); setLocationError(true); throw error; }
+    } catch (error) { setAddress(coords ? formatCoordinates(coords.latitude, coords.longitude) : '현재 위치를 확인하려면 눌러주세요'); throw error; }
     finally { setLocating(false); }
   }, [coords]);
 
@@ -71,8 +70,7 @@ export default function SosScreen() {
         <View style={styles.progressTrack}><View style={[styles.progress, { width: `${progress}%` }]} /></View>
       </Pressable>
       <Text style={styles.sectionTitle}>상세 신고</Text><Text style={styles.sectionDescription}>위치, 상황 설명, 사진·영상과 공유 동의를 함께 제출합니다.</Text>
-      <Text style={styles.label}>위치 정보</Text><Pressable onPress={() => void locate()} style={styles.location}><View style={styles.locationBadge}><MapPin size={13} color={colors.primary} /><Text style={styles.locationBadgeText}>현재 위치</Text></View><Text numberOfLines={2} style={styles.address}>{locating ? '현재 위치 확인 중...' : address}</Text><LocateFixed size={17} color={locationError ? colors.danger : colors.muted} /></Pressable>
-      {locationError && <Pressable onPress={() => void locate()}><Text style={styles.retry}>주소 변환에 실패했을 수 있습니다. 다시 시도</Text></Pressable>}
+      <Text style={styles.label}>위치 정보</Text><Pressable onPress={() => void locate()} style={styles.location}><View style={styles.locationBadge}><MapPin size={13} color={colors.primary} /><Text style={styles.locationBadgeText}>현재 위치</Text></View><Text numberOfLines={2} style={styles.address}>{locating ? '현재 위치 확인 중...' : address}</Text><LocateFixed size={17} color={colors.muted} /></Pressable>
       <Text style={styles.label}>상황 설명 (선택)</Text><TextInput multiline value={description} maxLength={2000} onChangeText={setDescription} placeholder="현재 상황을 입력해 주세요" placeholderTextColor="#A6ABB5" textAlignVertical="top" style={styles.textarea} />
       <Text style={styles.label}>사진/영상 첨부 (최대 4개)</Text><View style={styles.attachRow}><Pressable onPress={pickMedia} style={styles.add}><ImagePlus size={23} color={colors.muted} /><Text style={styles.addText}>추가</Text></Pressable>{media.map((asset, index) => <View key={`${asset.uri}-${index}`} style={styles.preview}><Image source={{ uri: asset.uri }} style={styles.thumbnail} /><Pressable onPress={() => setMedia((items) => items.filter((_, i) => i !== index))} style={styles.remove}><Trash2 size={13} color="white" /></Pressable><Text style={styles.mediaMeta}>{asset.type === 'video' ? '영상' : '사진'}{asset.size ? ` · ${(asset.size / 1024 / 1024).toFixed(1)}MB` : ''}</Text></View>)}</View>
       <View style={styles.consent}><Switch value={consent} onValueChange={setConsent} trackColor={{ false: '#D8DCE4', true: colors.primary }} thumbColor="white" style={styles.smallSwitch} /><Text style={styles.consentText}>위치 정보 및 사진 공유 동의</Text></View>

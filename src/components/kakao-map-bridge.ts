@@ -1,6 +1,7 @@
 import type { KakaoMapViewProps } from './kakao-map-view.shared';
-export const KAKAO_KEY = process.env.EXPO_PUBLIC_KAKAO_MAP_JAVASCRIPT_KEY ?? '';
-export const KAKAO_BRIDGE_URL = process.env.EXPO_PUBLIC_KAKAO_MAP_BRIDGE_URL ?? '';
+import { publicEnv } from '@/lib/env';
+export const KAKAO_KEY = publicEnv.kakaoJavaScriptKey;
+export const KAKAO_BRIDGE_URL = publicEnv.kakaoBridgeUrl;
 export function bridgePayload(props: KakaoMapViewProps) { return { type: 'HAEON_MAP_STATE', camera: props.camera, markers: props.markers, riskZones: props.activeLayer === 'danger-zone' ? props.riskZones ?? [] : [] }; }
 export function bridgeHtml() {
   return `<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><style>html,body,#map{width:100%;height:100%;margin:0}</style><script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=${encodeURIComponent(KAKAO_KEY)}&autoload=false"></script></head><body><div id="map"></div><script>

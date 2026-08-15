@@ -7,6 +7,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { DataSessionProvider } from '@/components/data-session-provider';
 import { colors } from '@/constants/theme';
 import { queryClient } from '@/lib/query/client';
+import { validatePublicEnv } from '@/lib/env';
 import { useAuthStore } from '@/stores/auth-store';
 
 function AuthenticatedApp() {
@@ -72,6 +73,11 @@ function AuthenticatedApp() {
 }
 
 export default function RootLayout() {
+  useEffect(() => {
+    const status = validatePublicEnv();
+    if (status.requiredMissing.length) console.warn(`[환경 설정] 필수 public env 누락: ${status.requiredMissing.join(', ')}`);
+    if (status.kakaoMissing.length) console.warn(`[지도 설정] Kakao Map fallback 사용: ${status.kakaoMissing.join(', ')} 누락`);
+  }, []);
   return (
     <SafeAreaProvider>
       <QueryClientProvider client={queryClient}>

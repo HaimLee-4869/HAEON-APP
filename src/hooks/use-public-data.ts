@@ -3,7 +3,16 @@ import { getPublicData, getPublicDataHealth } from '@/lib/api/client';
 import type { PublicDataParams, PublicDataService } from '@/types/public-data';
 
 function useService(service: PublicDataService, params: PublicDataParams = {}, enabled = true) {
-  return useQuery({ queryKey: ['public-data', service, params], queryFn: () => getPublicData(service, params), enabled, staleTime: 5 * 60_000, retry: 1 });
+  return useQuery({
+    queryKey: ['public-data', service, params],
+    queryFn: async () => {
+      const timeout = new Promise<never>((_, reject) => setTimeout(() => reject(new Error('공공데이터 응답 시간이 초과되었습니다.')), 8_000));
+      return Promise.race([getPublicData(service, params), timeout]);
+    },
+    enabled,
+    staleTime: 5 * 60_000,
+    retry: 0,
+  });
 }
 export const useWeatherAlert = (params?: PublicDataParams) => useService('weather-alert', params);
 export const useShortTermForecast = (params?: PublicDataParams, enabled = true) => useService('short-term-forecast', params, enabled);

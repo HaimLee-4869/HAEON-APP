@@ -2,6 +2,21 @@
 
 ## Kakao Map
 
+### 모바일 WebView bridge 배포 사양
+
+현재 HAEON 웹에는 모바일 WebView 전용 bridge route가 없다. 따라서 `EXPO_PUBLIC_KAKAO_MAP_BRIDGE_URL`에 넣을 수 있는 실제 배포 페이지가 마련되기 전까지 모바일 앱은 연동 완료 상태가 아니며 fallback을 표시한다.
+
+필요한 페이지(예: `https://haeon-safe.vercel.app/mobile/kakao-map-bridge`)는 다음을 충족해야 한다.
+
+- Kakao Developers에 등록된 HTTPS origin에서 제공하고 Kakao JavaScript SDK를 `autoload=false`로 로드한다.
+- SDK load/error와 `window.kakao.maps` 존재 여부를 확인한 뒤에만 `{ "type": "ready" }`를 전송한다.
+- React Native가 보내는 `HAEON_MAP_STATE` 메시지의 camera, markers, riskZones를 지도에 반영한다.
+- marker 선택 시 `{ "type": "marker", "id": "..." }`를 `window.ReactNativeWebView.postMessage`로 반환한다.
+- SDK, 초기화, payload 오류는 `{ "type": "error", "code": "..." }`로 반환해 앱이 명시적 fallback으로 전환할 수 있게 한다.
+- CSP에서 `https://dapi.kakao.com` 및 Kakao 지도 리소스를 허용하고, bridge URL의 실제 GET이 HTTP 200 HTML을 반환해야 한다.
+
+Expo Web은 WebView bridge가 아니라 브라우저용 Kakao SDK loader가 별도로 필요하다. 현재 `kakao-map-view.web.tsx`는 의도적으로 fallback만 렌더링한다.
+
 Expo SDK 54 / React Native 0.81 새 아키텍처에서 Android와 iOS를 함께 보장하는 유지보수된 Kakao Native SDK wrapper/config plugin을 채택하지 않았다. 앱은 `react-native-webview` 안에서 Kakao Maps JavaScript API를 실행하는 bridge adapter를 사용한다. 키나 등록 호스트가 없거나 SDK 로딩이 실패하면 화면은 `대체 지도`라고 명시된 fallback으로 전환한다.
 
 - `EXPO_PUBLIC_KAKAO_MAP_JAVASCRIPT_KEY`: Kakao JavaScript Key (서버 secret이 아님)

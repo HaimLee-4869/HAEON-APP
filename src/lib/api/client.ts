@@ -1,5 +1,6 @@
 import type { NormalizedPublicDataResponse, PublicDataHealth, PublicDataParams, PublicDataResult, PublicDataService } from '@/types/public-data';
-const API_BASE_URL = (process.env.EXPO_PUBLIC_HAEON_API_BASE_URL ?? '').replace(/\/$/, '');
+import { publicEnv } from '../env';
+const API_BASE_URL = publicEnv.apiBaseUrl;
 export class ApiError extends Error { constructor(message: string, readonly status: number, readonly code?: string) { super(message); } }
 async function request(path: string, params: PublicDataParams = {}) {
   if (!API_BASE_URL) throw new ApiError('EXPO_PUBLIC_HAEON_API_BASE_URL이 설정되지 않았습니다.', 0, 'CONFIGURATION');
@@ -29,7 +30,6 @@ export function mapPublicDataResponse(service: PublicDataService, body: unknown)
   return { status: 'success', data, latest: latest(data) };
 }
 export async function getPublicData(service: PublicDataService, params: PublicDataParams = {}): Promise<PublicDataResult> {
-  try { return mapPublicDataResponse(service, await request(`/api/public-data/${service}`, params)); }
-  catch (error) { const e = error as ApiError; return { status: 'error', data: null, latest: null, message: e.message, service, code: e.code }; }
+  return mapPublicDataResponse(service, await request(`/api/public-data/${service}`, params));
 }
 export const getPublicDataHealth = async () => await request('/api/public-data/health') as PublicDataHealth;

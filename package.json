@@ -11,7 +11,8 @@
     "typecheck": "tsc --noEmit",
     "lint": "expo lint",
     "test": "vitest run",
-    "build:web": "expo export --platform web"
+    "build:web": "expo export --platform web",
+    "qa:web": "node tests/web-qa.mjs"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",
@@ -39,8 +40,10 @@
   },
   "devDependencies": {
     "@types/react": "~19.1.0",
+    "babel-preset-expo": "~54.0.12",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",
+    "playwright-core": "^1.62.1",
     "typescript": "~5.9.2",
     "vitest": "^3.2.4"
   }

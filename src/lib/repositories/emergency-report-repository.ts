@@ -17,16 +17,16 @@ export function validateEmergencyReport(report: EmergencyReport): string[] {
 export class SupabaseEmergencyReportRepository implements EmergencyReportRepository {
   async create(report: EmergencyReport): Promise<EmergencyReport> {
     const errors = validateEmergencyReport(report); if (errors.length) throw new EmergencyRepositoryError(errors[0]!, 'validation');
-    if (!supabase) throw new EmergencyRepositoryError('신고 서버가 아직 설정되지 않았습니다.', 'not_configured');
+    if (!supabase) throw new EmergencyRepositoryError('현재 신고 서버 연결을 준비 중입니다.', 'not_configured');
     const { data: auth } = await supabase.auth.getUser();
     if (!auth.user) throw new EmergencyRepositoryError('로그인 후 신고할 수 있습니다.', 'unauthenticated');
-    if (report.media.length) throw new EmergencyRepositoryError('미디어 저장소 정책이 아직 준비되지 않았습니다. 첨부를 삭제하고 다시 시도해 주세요.', 'storage_unavailable');
+    if (report.media.length) throw new EmergencyRepositoryError('현재 신고 미디어 저장소 연결을 준비 중입니다. 첨부를 삭제하고 다시 시도해 주세요.', 'storage_unavailable');
     const { data, error } = await supabase.from('emergency_reports').insert({
       reporter_id: auth.user.id, report_type: report.type, description: report.description || null,
       latitude: report.latitude, longitude: report.longitude, address: report.address,
       sharing_consent: report.sharingConsent,
     }).select().single();
-    if (error) throw new EmergencyRepositoryError(`신고를 저장하지 못했습니다: ${error.message}`, 'database');
+    if (error) { const unavailable = error.code === '42P01' || /emergency_reports|schema cache|does not exist/i.test(error.message); throw new EmergencyRepositoryError(unavailable ? '현재 신고 서버 연결을 준비 중입니다.' : `신고를 저장하지 못했습니다: ${error.message}`, 'database'); }
     return mapRow(data);
   }
   async list(): Promise<EmergencyReport[]> {

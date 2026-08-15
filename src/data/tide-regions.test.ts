@@ -1,0 +1,4 @@
+import { describe, expect, it } from 'vitest';
+import { isTideRegion, regionParams } from './tide-regions';
+describe('tide region route', () => { it('validates every public route slug', () => { for (const slug of ['moseulpo', 'seogwipo', 'seongsan', 'jeju', 'ieodo', 'marado']) expect(isTideRegion(slug)).toBe(true); expect(isTideRegion('seongsanpo')).toBe(false); expect(isTideRegion('unknown')).toBe(false); }); it('uses only web-supported codes', () => expect(regionParams('jeju')).toMatchObject({ tide: { station: 'DT_0004' }, ocean: { station: 'TW_0075' } })); });
+describe('unsupported regional sources', () => { it('marks missing endpoints without issuing placeholder queries', () => { expect(regionParams('moseulpo')).toEqual({ tide: undefined, ocean: undefined, forecast: { area: 'daejeong' } }); expect(regionParams('ieodo')).toEqual({ tide: undefined, ocean: { station: 'KG_0021' }, forecast: undefined }); }); });

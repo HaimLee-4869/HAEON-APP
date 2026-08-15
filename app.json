@@ -6,7 +6,7 @@
     "orientation": "portrait",
     "scheme": "haeonsafe",
     "userInterfaceStyle": "light",
-    "icon": "./pic/app.png",
+    "icon": "./pic/app-new.png",
     "newArchEnabled": true,
     "plugins": [
       "expo-router",
@@ -37,8 +37,8 @@
     "android": {
       "package": "kr.haeon.safe",
       "adaptiveIcon": {
-        "foregroundImage": "./pic/app.png",
-        "backgroundColor": "#6C3BF4"
+        "foregroundImage": "./pic/app-new.png",
+        "backgroundColor": "#FFFFFF"
       },
       "permissions": [
         "android.permission.ACCESS_COARSE_LOCATION",

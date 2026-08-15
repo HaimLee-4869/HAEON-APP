@@ -13,6 +13,11 @@ export const designatedRiskZones: RiskZone[] = [{
   ],
 }];
 
+/** 개발용 사용자 접두어를 원본 데이터 변경 없이 지도 표시에서만 정리한다. */
+export function mapUserDisplayName(name: string) {
+  return name.replace(/^가상\s*사용자(?=\s|$)/, '사용자');
+}
+
 export function monitoringSubjectsToMarkers(subjects: MonitoringSubject[]): MapMarker[] {
   return subjects.flatMap(({ haenyeo, device, latestLocation, latestRisk, batteryLevel, connectionStatus, lastCommunicatedAt }) => {
     if (!device || !latestLocation || !Number.isFinite(latestLocation.latitude) || !Number.isFinite(latestLocation.longitude)) return [];
@@ -24,7 +29,7 @@ export function monitoringSubjectsToMarkers(subjects: MonitoringSubject[]): MapM
       status: disconnected ? 'disconnected' : (latestRisk?.level ?? 'safe'),
       latitude: latestLocation.latitude,
       longitude: latestLocation.longitude,
-      label: haenyeo.display_name || haenyeo.user_code,
+      label: mapUserDisplayName(haenyeo.display_name || haenyeo.user_code),
       userName: haenyeo.display_name,
       userCode: haenyeo.user_code,
       deviceCode: device.device_code,
